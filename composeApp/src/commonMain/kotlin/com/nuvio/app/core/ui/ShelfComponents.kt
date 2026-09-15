@@ -3,10 +3,8 @@ package com.nuvio.app.core.ui
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -38,7 +36,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +47,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Dp
@@ -59,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.nuvio.app.isDesktop
+import com.nuvio.app.core.ui.posterCardClickable
 import nuvio.composeapp.generated.resources.Res
 import nuvio.composeapp.generated.resources.home_view_all
 import nuvio.composeapp.generated.resources.poster_logo_content_description
@@ -279,7 +276,6 @@ fun NuvioPosterCard(
                     onLongClick = onLongClick,
                     zoomImageUrl = imageUrl,
                     zoomCornerRadius = posterCardStyle.cornerRadiusDp.dp,
-                    hoverScaleEnabled = false,
                 ),
             contentAlignment = Alignment.Center,
         ) {
@@ -556,47 +552,6 @@ internal fun Modifier.desktopPosterHoverScale(
             },
         )
         .hoverable(interactionSource)
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-internal fun Modifier.posterCardClickable(
-    onClick: (() -> Unit)?,
-    onLongClick: (() -> Unit)?,
-    zoomImageUrl: String? = null,
-    zoomCornerRadius: Dp = NuvioTokens.Radius.poster,
-    hoverScaleEnabled: Boolean = true,
-): Modifier {
-    if (onClick == null && onLongClick == null) return this
-    val bounds = remember { mutableStateOf<Rect?>(null) }
-    val interactionSource = remember { MutableInteractionSource() }
-    val handleLongClick = onLongClick?.let { longClick ->
-        {
-            bounds.value?.takeIf { zoomImageUrl != null }?.let { cardBounds ->
-                PosterZoomAnchorHolder.stash(
-                    PosterZoomAnchor(
-                        boundsInRoot = cardBounds,
-                        imageUrl = zoomImageUrl,
-                        cornerRadius = zoomCornerRadius,
-                    ),
-                )
-            }
-            longClick()
-        }
-    }
-    return this
-        .onGloballyPositioned { coordinates -> bounds.value = coordinates.unclippedBoundsInRoot() }
-        .desktopPosterHoverScale(
-            enabled = hoverScaleEnabled,
-            interactionSource = interactionSource,
-        )
-        .combinedClickable(
-            interactionSource = interactionSource,
-            indication = null,
-            onClick = { onClick?.invoke() },
-            onLongClick = handleLongClick,
-        )
-        .secondaryClick(handleLongClick)
 }
 
 private fun androidx.compose.ui.layout.LayoutCoordinates.unclippedBoundsInRoot(): Rect {

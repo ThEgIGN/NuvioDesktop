@@ -397,7 +397,6 @@ private fun CatalogPosterTile(
                         onLongClick = onLongClick,
                         zoomImageUrl = item.poster,
                         zoomCornerRadius = cornerRadiusDp.dp,
-                        hoverScaleEnabled = false,
                     ),
             ) {
                 if (item.poster != null) {

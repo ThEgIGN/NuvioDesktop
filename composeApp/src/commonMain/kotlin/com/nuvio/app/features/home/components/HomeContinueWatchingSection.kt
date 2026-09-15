@@ -1007,7 +1007,6 @@ private fun ContinueWatchingPosterCard(
                     onLongClick = onLongClick,
                     zoomImageUrl = imageUrl,
                     zoomCornerRadius = cornerRadius,
-                    hoverScaleEnabled = false,
                 ),
         ) {
             val shouldBlurArtwork = item.shouldBlurContinueWatchingArtwork(
